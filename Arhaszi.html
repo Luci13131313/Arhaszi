@@ -37,7 +37,8 @@
     #canvas-container {
       width: 360px;
       height: 480px;
-      background: radial-gradient(circle at center, #35654d, #1f3d2c);
+      background: radial-gradient(circle at center, #35654d, #1f3d2c),
+        url('assets/images/FarcadeLogo.svg') center/cover no-repeat;
       border-radius: 16px;
       box-shadow: 0 0 12px #000;
       position: relative;
@@ -219,83 +220,6 @@
       font-family: monospace;
     }
 
-    .card {
-      width: 80px;
-      height: 120px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      perspective: 1000px;
-      margin: 10px;
-    }
-
-    .card-back {
-      background: repeating-linear-gradient(45deg, #e5f4ff 0px, #e5f4ff 4px, #cde6ff 4px, #cde6ff 8px);
-      background-image: url('https://raw.githubusercontent.com/Luci13131313/Arhaszi/53b2f509563e588300c0c720c85d70f3f3b2cb00/assets/images/Farcade1Logo.svg');
-      background-size: 32px;
-      background-repeat: repeat;
-      background-position: center;
-      border: 2px solid #1e90ff;
-      transform: rotateY(180deg);
-    }
-
-    .card-front {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: white;
-      border-radius: 12px;
-      border: 2px solid #fff;
-      background: var(--card-bg, linear-gradient(145deg, #444, #222));
-      position: relative;
-    }
-
-    .suit-icon {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .suit-icon-bottom {
-      position: absolute;
-      bottom: 6px;
-      right: 6px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .card-front.farcade {
-      --card-bg: linear-gradient(145deg, #3f0d7a, #12042f);
-      border-color: #ae78f2;
-    }
-
-    .card-front.noun {
-      --card-bg: linear-gradient(145deg, #ffd700, #b8860b);
-      border-color: #ffeb3b;
-    }
-
-    .card-front.luci {
-      --card-bg: linear-gradient(145deg, #8b0000, #2c0000);
-      border-color: #e53935;
-    }
-
-    .card-front.luci-inv {
-      --card-bg: linear-gradient(145deg, #202040, #000020);
-      border-color: #6c63ff;
-    }
-
-    .card-front.doodle {
-      --card-bg: linear-gradient(145deg, #40c9a2, #2f7763);
-      border-color: #7ef9ff;
-    }
 
   </style>
 </head>
@@ -329,12 +253,6 @@
         <img id="lucky-img" src="https://github.com/Luci13131313/Arhaszi/blob/main/assets/images/Mr.%20Lucky.png?raw=true" alt="Mr. Lucky" />
         <div id="lucky-speech">...</div>
       </div>
-      <div class="card card-front farcade">
-        <img src="https://raw.githubusercontent.com/Luci13131313/Arhaszi/53b2f509563e588300c0c720c85d70f3f3b2cb00/assets/images/Farcade1Logo.svg" class="suit-icon" />
-        7
-        <img src="https://raw.githubusercontent.com/Luci13131313/Arhaszi/53b2f509563e588300c0c720c85d70f3f3b2cb00/assets/images/Farcade1Logo.svg" class="suit-icon-bottom" />
-      </div>
-      <div class="card card-back"></div>
     </div>    
     </div>    
   </div>
@@ -354,6 +272,11 @@
     suitIconMap.noun.src = "https://raw.githubusercontent.com/Luci13131313/Arhaszi/main/assets/images/Noun%20Logo.svg";
     suitIconMap.luci.src = "https://raw.githubusercontent.com/Luci13131313/Arhaszi/fb95c12cb9f26c38f6153cb06e78a836287338c6/assets/images/LL%20(1).svg";
     suitIconMap.doodle.src = "https://github.com/Luci13131313/DrawDoodle/blob/main/assets/images/Hap.png?raw=true";
+function getSuitColor(suit) {
+  const colors = { farcade: "#3f0d7a", noun: "#d4af37", doodle: "#40c9a2", luci: "#8b0000" };
+  return colors[suit] || "#fff";
+}
+
 
 let deck = [];
 let playerCards = [];
@@ -381,15 +304,6 @@ const canvas = document.getElementById("game-canvas");
 const ctx = canvas.getContext("2d");
 
 //  [2] Deck System - generateDeck(), shuffleDeck(), deal logic
-
-const suitIcons = {
-  farcade: "https://raw.githubusercontent.com/Luci13131313/Arhaszi/53b2f509563e588300c0c720c85d70f3f3b2cb00/assets/images/Farcade1Logo.svg",
-  noun: "https://raw.githubusercontent.com/Luci13131313/Arhaszi/53b2f509563e588300c0c720c85d70f3f3b2cb00/assets/images/Noun%20Logo.svg",
-  doodle: "https://github.com/Luci13131313/DrawDoodle/blob/main/assets/images/Hap.png?raw=true",
-  luci: "https://raw.githubusercontent.com/Luci13131313/Arhaszi/fb95c12cb9f26c38f6153cb06e78a836287338c6/assets/images/LL%20(1).svg",
-};
-
-
 function generateDeck() {
   deck = [];
   const suits = ["farcade", "noun", "doodle", "luci"];
@@ -401,29 +315,6 @@ function generateDeck() {
   shuffleDeck(deck);
 }
 
-
-function createCardElement(value, suit, isFront = true) {
-  const card = document.createElement("div");
-  card.className = `card ${isFront ? "card-front" : "card-back"} ${suit}`;
-
-  if (isFront) {
-    const topIcon = document.createElement("img");
-    topIcon.src = suitIcons[suit];
-    topIcon.className = "suit-icon";
-    card.appendChild(topIcon);
-
-    const val = document.createElement("div");
-    val.innerText = value;
-    card.appendChild(val);
-
-    const bottomIcon = document.createElement("img");
-    bottomIcon.src = suitIcons[suit];
-    bottomIcon.className = "suit-icon-bottom";
-    card.appendChild(bottomIcon);
-  }
-
-  return card;
-}
 
 function shuffleDeck(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -453,14 +344,14 @@ function drawPlayerCards() {
     const card = playerCards[i];
     const x = startX + i * (cardWidth + spacing);
 
-    ctx.fillStyle = "#fff";
-    ctx.fillRect(x, y, cardWidth, cardHeight);
-    ctx.strokeStyle = "#000";
-    ctx.strokeRect(x, y, cardWidth, cardHeight);
-    ctx.fillStyle = "#000";
-    ctx.font = "28px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(card.value, x + cardWidth / 2, y + cardHeight / 2);
+      ctx.fillStyle = getSuitColor(card.suit);
+      ctx.fillRect(x, y, cardWidth, cardHeight);
+      ctx.strokeStyle = "#000";
+      ctx.strokeRect(x, y, cardWidth, cardHeight);
+      ctx.fillStyle = "#fff";
+      ctx.font = "28px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(card.value, x + cardWidth / 2, y + cardHeight / 2);
 
     if (suitIconMap[card.suit]) {
       ctx.drawImage(suitIconMap[card.suit], x + 4, y + 4, 20, 20);
@@ -469,18 +360,19 @@ function drawPlayerCards() {
   }
 }
 
-function drawAICard(reveal = false) {
+function drawAICard(show) {
+  const reveal = typeof show === 'boolean' ? show : false;
   const cardWidth = 50;
   const cardHeight = 70;
   const x = (canvas.width - cardWidth) / 2;
   const y = 40;
 
   const card = aiCards[0];
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = getSuitColor(card.suit);
   ctx.fillRect(x, y, cardWidth, cardHeight);
   ctx.strokeStyle = "#000";
   ctx.strokeRect(x, y, cardWidth, cardHeight);
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#fff";
   ctx.font = "28px Arial";
   ctx.textAlign = "center";
   ctx.fillText(reveal ? card.value : "?", x + cardWidth / 2, y + cardHeight / 2);
@@ -492,7 +384,8 @@ function drawAICard(reveal = false) {
 }
 
 
-function drawAICards(reveal = false) {
+function drawAICards(show = false) {
+  const reveal = typeof show === 'boolean' ? show : false;
   const cardWidth = 50;
   const cardHeight = 70;
   const spacing = 20;
@@ -503,11 +396,11 @@ function drawAICards(reveal = false) {
   for (let i = 0; i < aiCards.length; i++) {
     const card = aiCards[i];
     const x = startX + i * (cardWidth + spacing);
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = getSuitColor(card.suit);
     ctx.fillRect(x, y, cardWidth, cardHeight);
     ctx.strokeStyle = "#000";
     ctx.strokeRect(x, y, cardWidth, cardHeight);
-    ctx.fillStyle = "#000";
+    ctx.fillStyle = "#fff";
     ctx.font = "28px Arial";
     ctx.textAlign = "center";
     ctx.fillText(reveal ? card.value : "?", x + cardWidth / 2, y + cardHeight / 2);
@@ -959,12 +852,12 @@ function drawMiddleCard(card, player = 'player') {
 
   let midX = startX + (cardWidth + spacing) / 2;
 
-  ctx.fillStyle = "#fff";
+  ctx.fillStyle = getSuitColor(card.suit);
   ctx.fillRect(midX, y, cardWidth, cardHeight);
   ctx.strokeStyle = "#000";
   ctx.strokeRect(midX, y, cardWidth, cardHeight);
 
-  ctx.fillStyle = "#000";
+  ctx.fillStyle = "#fff";
   ctx.font = "28px Arial";
   ctx.textAlign = "center";
   ctx.fillText(card.value, midX + cardWidth / 2, y + cardHeight / 2);
